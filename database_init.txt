@@ -1,0 +1,127 @@
+-- ========================
+-- ПОЛЬЗОВАТЕЛИ
+-- ========================
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(25) UNIQUE NOT NULL, -- имя пользователя
+    email VARCHAR(255) UNIQUE NOT NULL, -- почта
+    password_hash TEXT NOT NULL, -- зашифрованный пароль
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP -- время создания аккаунта
+);
+
+CREATE INDEX idx_users_email ON users(email);
+
+-- ========================
+-- ENUM ДЛЯ ЖАНРОВ
+-- ========================
+CREATE TYPE genre_enum AS ENUM (
+    'fantasy',
+    'sci_fi',
+    'horror',
+    'detective',
+    'thriller',
+    'drama',
+    'romance',
+    'adventure',
+    'action',
+    'mystic',
+    'historical',
+    'crime',
+    'comedy'
+);
+
+-- ========================
+-- ИСТОРИИ
+-- ========================
+CREATE TABLE IF NOT EXISTS stories (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL, -- кому принадлежит история
+    title VARCHAR(255) NOT NULL, -- название
+    short_description VARCHAR(500), -- короткое описание
+    full_description TEXT, -- полное описание
+    genre genre_enum, -- жанр
+    cover_url VARCHAR(500), -- обложка
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- дата создания
+    updated_at TIMESTAMP, -- дата обновления
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ========================
+-- СОБЫТИЯ
+-- ========================
+CREATE TABLE IF NOT EXISTS events (
+    id BIGSERIAL PRIMARY KEY,
+    story_id BIGINT NOT NULL, -- к какой истории относится
+    title VARCHAR(255) NOT NULL, -- название
+    content TEXT, -- содержание события
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- время создания
+    updated_at TIMESTAMP, -- время обновления
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_events_story ON events(story_id);
+
+-- ========================
+-- СВЯЗИ СОБЫТИЙ (граф сюжета)
+-- ========================
+CREATE TABLE IF NOT EXISTS event_links (
+    id BIGSERIAL PRIMARY KEY,
+    from_event_id BIGINT NOT NULL, -- из какого события идёт переход
+    to_event_id BIGINT NOT NULL, -- в какое событие ведёт переход
+    choice_text VARCHAR(255), -- описание выбора (необязательно)
+    FOREIGN KEY (from_event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (to_event_id) REFERENCES events(id) ON DELETE CASCADE
+);
+
+-- ========================
+-- ПЕРСОНАЖИ
+-- ========================
+CREATE TABLE IF NOT EXISTS characters (
+    id BIGSERIAL PRIMARY KEY,
+    story_id BIGINT NOT NULL, -- к какой истории относится
+    name VARCHAR(255) NOT NULL, -- имя персонажа
+    description TEXT, -- описание персонажа
+    image_url VARCHAR(500), -- изображение
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_characters_story ON characters(story_id);
+
+-- ========================
+-- СОБЫТИЕ_ПЕРСОНАЖ (многие-ко-многим)
+-- ========================
+CREATE TABLE IF NOT EXISTS event_characters (
+    event_id BIGINT NOT NULL, -- событие
+    character_id BIGINT NOT NULL, -- персонаж
+    PRIMARY KEY (event_id, character_id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+);
+
+-- ========================
+-- СВЯЗИ ПЕРСОНАЖЕЙ
+-- ========================
+CREATE TABLE IF NOT EXISTS character_relationships (
+    id BIGSERIAL PRIMARY KEY,
+    story_id BIGINT NOT NULL, -- к какой истории относится
+    character1_id BIGINT NOT NULL, -- первый персонаж
+    character2_id BIGINT NOT NULL, -- второй персонаж
+    FOREIGN KEY (story_id) REFERENCES stories(id) ON DELETE CASCADE,
+    FOREIGN KEY (character1_id) REFERENCES characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (character2_id) REFERENCES characters(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_relationships_story ON character_relationships(story_id);
+
+-- ========================
+-- ИСТОРИЯ ВЗАИМООТНОШЕНИЙ
+-- ========================
+CREATE TABLE IF NOT EXISTS relationship_history (
+    id BIGSERIAL PRIMARY KEY,
+    relationship_id BIGINT NOT NULL, -- связь между персонажами
+    event_id BIGINT NOT NULL, -- событие, где изменилось
+    relationship_type VARCHAR(100) NOT NULL, -- тип (пользовательский, например: "друг", "враг")
+    color VARCHAR(20), -- цвет связи (для визуализации)
+    FOREIGN KEY (relationship_id) REFERENCES character_relationships(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+);

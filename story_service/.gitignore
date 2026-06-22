@@ -1,0 +1,74 @@
+# Compiled class files
+*.class
+*/target/
+target/
+
+# Package files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDE files - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+*.swp
+*.swo
+*~
+
+# Eclipse
+.settings/
+.project
+.classpath
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.log
+
+# VS Code
+.vscode/
+.history/
+*.code-workspace
+
+# Maven
+log/
+.mvn/
+mvnw
+mvnw.cmd
+HELP.md
+.mvn/timing.properties
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Application specific
+**/application.properties
+**/application-local.properties
+**/application-dev.properties
+*.log
+
+# Secrets / sensitive data
+**/application-secrets.properties
+*.p12
+*.jks
+*.key
+*.crt
+
+# Test files
+*.test
+*.tests
+
+# DevTools
+.springBeans
+.sts4-cache
