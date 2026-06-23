@@ -38,7 +38,7 @@
 ### 1. Клонирование репозитория
 
 ```bash
-git clone https://github.com/ваш-логин/story-planner.git
+git clone https://github.com/DiMa526526/story-planner.git
 cd story-planner
 ```
 
