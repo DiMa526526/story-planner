@@ -55,13 +55,13 @@ CREATE DATABASE story_planner_db;
 2. Заполните application.properties по примеру из файла application-example.properties
 
 
-### 3. Настройка Frontend-части
+### 4. Настройка Frontend-части
 
 1. Перейдите в папку story_client
 2. Установите зависимости npm install
 
 
-### 4. Запуск
+### 5. Запуск
 
 1. Запустите серверную часть
 
