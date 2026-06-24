@@ -72,6 +72,12 @@ const StoryDetail = () => {
     { icon: '♡', label: 'Связей персонажей', count: stats.relationships.length, link: `/stories/${id}/relationships`, color: 'stat-card--pink' }
   ];
 
+  // Берём только первые 5 персонажей и событий
+  const displayedCharacters = stats.characters.slice(0, 5);
+  const displayedEvents = stats.events.slice(0, 5);
+  const hasMoreCharacters = stats.characters.length > 5;
+  const hasMoreEvents = stats.events.length > 5;
+
   return (
     <div className="story-detail-page">
       <div className="story-detail-header">
@@ -119,16 +125,23 @@ const StoryDetail = () => {
           {stats.characters.length === 0 ? (
             <p className="story-section-empty">Нет персонажей</p>
           ) : (
-            <div className="story-section-list">
-              {stats.characters.map(char => (
-                <Link key={char.id} to={`/characters/${char.id}`} className="story-section-item">
-                  <span className="story-section-item-name">{char.name}</span>
-                  <span className="story-section-item-preview">
-                    {truncateText(char.description, 50)}
-                  </span>
+            <>
+              <div className="story-section-list">
+                {displayedCharacters.map(char => (
+                  <Link key={char.id} to={`/characters/${char.id}`} className="story-section-item">
+                    <span className="story-section-item-name">{char.name}</span>
+                    <span className="story-section-item-preview">
+                      {truncateText(char.description, 50)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              {hasMoreCharacters && (
+                <Link to={`/stories/${id}/characters`} className="story-section-show-all">
+                  Показать всех →
                 </Link>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </Card>
 
@@ -144,14 +157,21 @@ const StoryDetail = () => {
           {stats.events.length === 0 ? (
             <p className="story-section-empty">Нет событий</p>
           ) : (
-            <div className="story-section-list">
-              {stats.events.map(event => (
-                <Link key={event.id} to={`/stories/${id}/events/${event.id}`} className="story-section-item story-section-item--block">
-                  <div className="story-section-item-name">{event.title}</div>
-                  <div className="story-section-item-preview">{event.content?.slice(0, 80)}</div>
+            <>
+              <div className="story-section-list">
+                {displayedEvents.map(event => (
+                  <Link key={event.id} to={`/stories/${id}/events/${event.id}`} className="story-section-item story-section-item--block">
+                    <div className="story-section-item-name">{event.title}</div>
+                    <div className="story-section-item-preview">{event.content?.slice(0, 80)}</div>
+                  </Link>
+                ))}
+              </div>
+              {hasMoreEvents && (
+                <Link to={`/stories/${id}/events`} className="story-section-show-all">
+                  Показать все →
                 </Link>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </Card>
       </div>
